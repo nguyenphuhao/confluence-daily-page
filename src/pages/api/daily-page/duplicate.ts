@@ -9,9 +9,9 @@ export default async function handler(
     res: NextApiResponse<Data>
 ) {
     try {
-        const { parentPageId } = req.body;
+        const { parentPageId, prefix } = req.body;
         const service = new DailyPageService();
-        await service.duplicate(parentPageId);
+        await service.duplicate(parentPageId, prefix);
         res.status(200).json({ message: 'Success' })
     } catch (error) {
         res.status(500).json({ message: (error as any).message });

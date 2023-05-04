@@ -3,7 +3,7 @@ import confluenceAPI from '../common/confluence';
 import { createNewCard, getList, updateList } from '../api-clients/trello';
 
 class DailyPageService {
-  async duplicate(parentPageId = '428310577') {
+  async duplicate(parentPageId = '428310577', prefix?: string) {
     try {
       const confluence = confluenceAPI();
       const now = moment();
@@ -24,6 +24,7 @@ class DailyPageService {
         "copyDescendants": true,
         "destinationPageId": parentPageId,
         "titleOptions": {
+          "prefix": prefix,
           "replace": title,
           "search": search
         }
