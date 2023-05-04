@@ -1,10 +1,11 @@
 import moment from 'moment';
-import confluence from '../common/confluence';
+import confluenceAPI from '../common/confluence';
 import { createNewCard, getList, updateList } from '../api-clients/trello';
 
 class DailyPageService {
   async duplicate(parentPageId = '428310577') {
     try {
+      const confluence = confluenceAPI();
       const now = moment();
       const title = now.format('D MMM');
       const search = now.subtract(1, 'days').format('D MMM');

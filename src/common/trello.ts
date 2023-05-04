@@ -11,8 +11,8 @@ instance.defaults.headers.common['Content-Type'] = 'application/json';
 
 type HTTPMethod = 'get' | 'post' | 'put' | 'delete';
 const trelloAPI = <T>(path: string, method: HTTPMethod, params?: T,) => {
-  const apiKey = 'ca653e7f7e0fe8b85894d88dc13ddfb2';
-  const token = 'ATTA2ce2d8dd56fe41f55eac1d5505bb2ed82cf815bd0cd415c7b8e99326b46bee04330D30B2';
+  const apiKey = process.env.TRELLO_API_KEY;
+  const token = process.env.TRELLO_SECRET_KEY;
   return instance[method](`${path}?key=${apiKey}&token=${token}`, params as any);
 }
 
