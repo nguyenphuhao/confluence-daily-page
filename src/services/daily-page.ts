@@ -31,7 +31,11 @@ class DailyPageService {
       });
       const task = res.data;
       let counter = 0;
+      let done = false;
       const intVal = setInterval(async () => {
+        if (done) {
+          return;
+        }
         if (counter > 10) {
           clearInterval(intVal);
           return;
@@ -46,7 +50,8 @@ class DailyPageService {
           const urlFragment = detail.destinationUrl.split('/');
           await updateList({
             name: urlFragment[urlFragment.length - 2]
-          })
+          });
+          done = true;
           clearInterval(intVal);
         }
       }, 30000);
