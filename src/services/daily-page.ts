@@ -40,7 +40,7 @@ class DailyPageService {
         if (result?.data?.additionalDetails?.destinationUrl) {
           const detail = result.data.additionalDetails;
           await createNewCard({
-            name: `https://propine.atlassian.net/wiki${detail.destinationUrl}`,
+            name: `${process.env.CONFLUENCE_HOST}/wiki${detail.destinationUrl}`,
             desc: detail.destinationId
           });
           const urlFragment = detail.destinationUrl.split('/');
@@ -49,7 +49,7 @@ class DailyPageService {
           })
           clearInterval(intVal);
         }
-      }, 5000);
+      }, 30000);
       return 'OK';
     } catch (error) {
       throw error;

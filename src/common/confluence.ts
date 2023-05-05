@@ -3,7 +3,7 @@ import axios from 'axios';
 const confluenceAPI = () => {
   // Set config defaults when creating the instance
   const confluence = axios.create({
-    baseURL: 'https://propine.atlassian.net'
+    baseURL: process.env.CONFLUENCE_HOST
   });
 
   // Alter defaults after instance has been created
