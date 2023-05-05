@@ -43,18 +43,18 @@ class DailyPageService {
         const result = await confluence.get(`/wiki/rest/api/longtask/${task.id}`);
         if (result?.data?.additionalDetails?.destinationUrl) {
           const detail = result.data.additionalDetails;
-          await createNewCard({
+          createNewCard({
             name: `${process.env.CONFLUENCE_HOST}/wiki${detail.destinationUrl}`,
             desc: detail.destinationId
           });
           const urlFragment = detail.destinationUrl.split('/');
-          await updateList({
+          updateList({
             name: urlFragment[urlFragment.length - 2]
           });
           done = true;
           clearInterval(intVal);
         }
-      }, 30000);
+      }, 10000);
       return 'OK';
     } catch (error) {
       throw error;
