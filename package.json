@@ -9,13 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/amqp-connection-manager": "^3.4.1",
+    "@types/lodash": "^4.14.194",
     "@types/node": "18.16.3",
     "@types/react": "18.2.0",
     "@types/react-dom": "18.2.1",
     "@vercel/edge-config": "^0.1.9",
+    "amqp-connection-manager": "^4.1.13",
+    "amqplib": "^0.10.3",
     "axios": "^1.4.0",
     "eslint": "8.39.0",
     "eslint-config-next": "13.3.4",
+    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "next": "13.3.4",
     "react": "18.2.0",

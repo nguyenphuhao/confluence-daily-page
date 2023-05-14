@@ -1,62 +1,72 @@
+import { ConfluenceAPI } from '@/common/confluence-api';
 import moment from 'moment';
-import confluenceAPI from '../common/confluence';
-import { createNewCard, getList, updateList } from '../api-clients/trello';
+import { TrelloAPI } from '@/common/trello-api';
+import { IMessagePublisher } from '@/common/message-broker/rabbitmq/publisher/interface';
+import { DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE } from '@/mq-services/daily-page/config';
 
 class DailyPageService {
-  async duplicate(parentPageId = '428310577', prefix?: string) {
-    try {
-      const confluence = confluenceAPI();
-      const now = moment();
-      const title = now.format('D MMM');
-      const search = now.subtract(1, 'days').format('D MMM');
+  constructor(private confluence: ConfluenceAPI, private trello: TrelloAPI, private messageBroker: IMessagePublisher) {
 
-      const getCurrentSourcePageId = async () => {
-        const res = await getList();
-        return res?.data?.name;
+  }
+  private async getLatestPage(parentPageId: string) {
+    try {
+      const pages = await this.confluence.getChildrenPages(parentPageId)
+      if (!pages[0]) {
+        return;
       }
-      const fromPageId = await getCurrentSourcePageId();
-      const res = await confluence.post(`/wiki/rest/api/content/${fromPageId}/pagehierarchy/copy`, {
-        "copyAttachments": true,
-        "copyPermissions": true,
-        "copyProperties": true,
-        "copyLabels": true,
-        "copyCustomContents": true,
-        "copyDescendants": true,
-        "destinationPageId": parentPageId,
-        "titleOptions": {
-          "prefix": prefix,
-          "replace": title,
-          "search": search
-        }
-      });
-      const task = res.data;
-      let counter = 0;
-      let done = false;
-      const intVal = setInterval(async () => {
-        if (done) {
-          return;
-        }
-        if (counter > 10) {
-          clearInterval(intVal);
-          return;
-        }
-        const result = await confluence.get(`/wiki/rest/api/longtask/${task.id}`);
-        if (result?.data?.additionalDetails?.destinationUrl) {
-          const detail = result.data.additionalDetails;
-          createNewCard({
-            name: `${process.env.CONFLUENCE_HOST}/wiki${detail.destinationUrl}`,
-            desc: detail.destinationId
-          });
-          const urlFragment = detail.destinationUrl.split('/');
-          updateList({
-            name: urlFragment[urlFragment.length - 2]
-          });
-          done = true;
-          clearInterval(intVal);
-        }
-      }, 10000);
-      return 'OK';
+      return pages[0];
     } catch (error) {
+      throw error;
+    }
+  }
+  private getCurrentTitle() {
+    const now = moment();
+    return now.format('D MMM');
+  }
+
+  async duplicatePage(parentPageId = '428310577', prefix?: string) {
+    try {
+      const title = this.getCurrentTitle();
+      const latestPage = await this.getLatestPage(parentPageId);
+      if (!latestPage) {
+        return;
+      }
+
+      const task = await this.confluence.duplicatePage({
+        parentPageId, fromPageId: latestPage?.id, title, search: latestPage?.title, prefix
+      });
+      if (!task) {
+        return;
+      }
+
+      setTimeout(() => {
+        this.messageBroker.publish(DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE, {
+          taskId: task.id
+        });
+      }, 5000);
+      return task;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async sync(taskId: string) {
+    try {
+      const task = await this.confluence.getLongTask(taskId);
+      if (!task?.successful) {
+        console.log('sync', 'in progress');
+        throw new Error('in progress');
+      }
+      console.log('task', task);
+      const detail = task?.additionalDetails;
+      await this.trello.createNewCard({
+        name: `${process.env.CONFLUENCE_HOST}/wiki${detail.destinationUrl}`,
+        desc: detail.destinationId
+      });
+      return detail;
+    } catch (error) {
+      console.error(error);
       throw error;
     }
   }
