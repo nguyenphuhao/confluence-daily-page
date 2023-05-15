@@ -1,10 +1,12 @@
 import { ConfluenceAPI } from '@/common/confluence-api';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { IMessagePublisher } from '@/common/message-broker/rabbitmq/publisher/interface';
 import { DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE } from '@/mq-services/daily-page/config';
 
 class DailyPageService {
-  constructor(private confluence: ConfluenceAPI, private messageBroker: IMessagePublisher) { }
+  constructor(private confluence: ConfluenceAPI, private messageBroker: IMessagePublisher) {
+    process.env.TZ = 'Asia/Bangkok';
+  }
   private async getLatestPage(parentPageId: string) {
     try {
       const pages = await this.confluence.getChildrenPages(parentPageId)
@@ -18,7 +20,7 @@ class DailyPageService {
   }
   private getCurrentTitle() {
     const now = moment();
-    return now.format('D MMM');
+    return now.tz(process.env.TIMEZONE_ASIA_BANGKOK!).format('D MMM');
   }
 
   async duplicatePage(parentPageId = '428310577', prefix?: string) {

@@ -5,5 +5,4 @@ const nextConfig = {
     ignoreBuildErrors: true,
   }
 }
-process.env.TZ = 'Asia/Bangkok';
 module.exports = nextConfig

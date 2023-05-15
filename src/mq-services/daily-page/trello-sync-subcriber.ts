@@ -9,7 +9,9 @@ type TaskId = {
   taskId: string
 }
 export class TrelloSyncSubcriber implements Subcriber {
-  constructor(private messageBroker: DirectSubcriber, private confluence: ConfluenceAPI, private dailyPageAPI: DailyPageAPI) { }
+  constructor(private messageBroker: DirectSubcriber, private confluence: ConfluenceAPI, private dailyPageAPI: DailyPageAPI) {
+    process.env.TZ = 'Asia/Bangkok';
+  }
   subcribe() {
     this.messageBroker.subcribe<Partial<TaskId>>({
       exchange: DAILY_PAGE_EXCHANGE,

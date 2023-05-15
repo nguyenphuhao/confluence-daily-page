@@ -4,10 +4,7 @@ import DailyPageService from '../../../services/daily-page';
 import { ConfluenceAPI } from '@/common/confluence-api';
 import { MessagePublisher } from '@/common/message-broker/rabbitmq/publisher';
 import { RabbitMQConnection } from '@/common/message-broker/rabbitmq/connection';
-import { TrelloSyncSubcriber } from '@/mq-services/daily-page/trello-sync-subcriber';
-import { DirectSubcriber } from '@/common/message-broker/rabbitmq/subcribers/direct';
 import toResponse from '@/common/helpers/toResponse';
-import { DailyPageAPI } from '@/common/power-automate-api/daily-page-api';
 type Data = {
   message: string
 }
