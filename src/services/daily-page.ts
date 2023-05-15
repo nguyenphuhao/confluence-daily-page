@@ -20,7 +20,7 @@ class DailyPageService {
   }
   private getCurrentTitle() {
     const now = moment();
-    return now.tz(process.env.TIMEZONE_ASIA_BANGKOK!).format('D MMM');
+    return now.format('D MMM');
   }
 
   async duplicatePage(parentPageId = '428310577', prefix?: string) {

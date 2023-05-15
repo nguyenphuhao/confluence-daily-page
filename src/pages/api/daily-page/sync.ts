@@ -8,6 +8,7 @@ import { TrelloSyncSubcriber } from '@/mq-services/daily-page/trello-sync-subcri
 import { DirectSubcriber } from '@/common/message-broker/rabbitmq/subcribers/direct';
 import toResponse from '@/common/helpers/toResponse';
 import { DailyPageAPI } from '@/common/power-automate-api/daily-page-api';
+import moment from 'moment-timezone';
 type Data = {
   message: string
 }
@@ -16,6 +17,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   try {
+    moment.tz.setDefault(process.env.TIMEZONE_ASIA_BANGKOK);
     const mqConnection = RabbitMQConnection.getConnection();
     new TrelloSyncSubcriber(
       new DirectSubcriber(mqConnection),
