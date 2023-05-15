@@ -1,13 +1,10 @@
 import { ConfluenceAPI } from '@/common/confluence-api';
 import moment from 'moment';
-import { TrelloAPI } from '@/common/trello-api';
 import { IMessagePublisher } from '@/common/message-broker/rabbitmq/publisher/interface';
 import { DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE } from '@/mq-services/daily-page/config';
 
 class DailyPageService {
-  constructor(private confluence: ConfluenceAPI, private trello: TrelloAPI, private messageBroker: IMessagePublisher) {
-
-  }
+  constructor(private confluence: ConfluenceAPI, private messageBroker: IMessagePublisher) { }
   private async getLatestPage(parentPageId: string) {
     try {
       const pages = await this.confluence.getChildrenPages(parentPageId)
@@ -38,33 +35,10 @@ class DailyPageService {
       if (!task) {
         return;
       }
-
-      setTimeout(() => {
-        this.messageBroker.publish(DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE, {
-          taskId: task.id
-        });
-      }, 5000);
-      return task;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-
-  async sync(taskId: string) {
-    try {
-      const task = await this.confluence.getLongTask(taskId);
-      if (!task?.successful) {
-        console.log('sync', 'in progress');
-        throw new Error('in progress');
-      }
-      console.log('task', task);
-      const detail = task?.additionalDetails;
-      await this.trello.createNewCard({
-        name: `${process.env.CONFLUENCE_HOST}/wiki${detail.destinationUrl}`,
-        desc: detail.destinationId
+      this.messageBroker.publish(DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE, {
+        taskId: task.id
       });
-      return detail;
+      return task;
     } catch (error) {
       console.error(error);
       throw error;

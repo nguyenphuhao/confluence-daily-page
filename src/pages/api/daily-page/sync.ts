@@ -16,15 +16,13 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    const { parentPageId, prefix } = req.body;
     const mqConnection = RabbitMQConnection.getConnection();
-
-    const service = new DailyPageService(
+    new TrelloSyncSubcriber(
+      new DirectSubcriber(mqConnection),
       new ConfluenceAPI(),
-      new MessagePublisher(mqConnection),
-    );
-    const result = await service.duplicatePage(parentPageId, prefix);
-    res.status(200).json(toResponse(result));
+      new DailyPageAPI()
+    ).subcribe();
+    res.status(200).json(toResponse(true));
   } catch (error) {
     res.status(500).json({ message: (error as any).message || 'Internal server error' });
   }
