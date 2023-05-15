@@ -5,7 +5,6 @@ import { ConfluenceAPI } from '@/common/confluence-api';
 import { MessagePublisher } from '@/common/message-broker/rabbitmq/publisher';
 import { RabbitMQConnection } from '@/common/message-broker/rabbitmq/connection';
 import toResponse from '@/common/helpers/toResponse';
-import moment from 'moment-timezone';
 type Data = {
   message: string
 }
@@ -14,7 +13,6 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    moment.tz.setDefault(process.env.TIMEZONE_ASIA_BANGKOK);
     const { parentPageId, prefix } = req.body;
     const mqConnection = RabbitMQConnection.getConnection();
 

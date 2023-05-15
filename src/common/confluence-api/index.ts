@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import moment from 'moment';
+import moment from '@/common/moment';
 import { sortBy } from 'lodash';
 
 export class ConfluenceAPI {
@@ -66,7 +66,7 @@ export class ConfluenceAPI {
   async getChildrenPages(parentPageId: string): Promise<{
     id: string;
     title: string;
-    createdDate: Date;
+    createdDate: string;
   }[]> {
     try {
       const res = await this.confluence.get(`/content/${parentPageId}/descendant/page`);
@@ -78,7 +78,7 @@ export class ConfluenceAPI {
         return {
           id: p.id,
           title: p.title,
-          createdDate: moment(p.title, 'D MMM').toDate()
+          createdDate: moment(p.title).format('YYYY/MM/DD')
         }
       });
       const sortedPages = sortBy(pages, (p) => p.createdDate).reverse();

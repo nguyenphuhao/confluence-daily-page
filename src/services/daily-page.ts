@@ -1,11 +1,10 @@
 import { ConfluenceAPI } from '@/common/confluence-api';
-import moment from 'moment-timezone';
+import moment from '@/common/moment';
 import { IMessagePublisher } from '@/common/message-broker/rabbitmq/publisher/interface';
 import { DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE } from '@/mq-services/daily-page/config';
 
 class DailyPageService {
   constructor(private confluence: ConfluenceAPI, private messageBroker: IMessagePublisher) {
-    process.env.TZ = 'Asia/Bangkok';
   }
   private async getLatestPage(parentPageId: string) {
     try {
