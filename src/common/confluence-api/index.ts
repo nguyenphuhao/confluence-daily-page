@@ -78,7 +78,7 @@ export class ConfluenceAPI {
         return {
           id: p.id,
           title: p.title,
-          createdDate: moment(p.title).format('YYYY/MM/DD')
+          createdDate: moment(p.title, 'D MMM').format('YYYY/MM/DD')
         }
       });
       const sortedPages = sortBy(pages, (p) => p.createdDate).reverse();
