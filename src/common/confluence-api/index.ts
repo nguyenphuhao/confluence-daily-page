@@ -78,7 +78,7 @@ export class ConfluenceAPI {
         return {
           id: p.id,
           title: p.title,
-          createdDate: moment(p.title, 'D MMM').toDate()
+          createdDate: moment(p.title, 'D MMM', process.env.TIMEZONE_ASIA_BANGKOK)
         }
       });
       const sortedPages = sortBy(pages, (p) => p.createdDate).reverse();
