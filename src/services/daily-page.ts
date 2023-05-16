@@ -22,7 +22,7 @@ class DailyPageService {
     return now.format('D MMM');
   }
 
-  async duplicatePage(parentPageId = '428310577', prefix?: string) {
+  async duplicatePage(parentPageId: string, prefix?: string) {
     try {
       const title = this.getCurrentTitle();
       const latestPage = await this.getLatestPage(parentPageId);

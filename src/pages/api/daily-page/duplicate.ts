@@ -4,7 +4,8 @@ import DailyPageService from '../../../services/daily-page';
 import { ConfluenceAPI } from '@/common/confluence-api';
 import { MessagePublisher } from '@/common/message-broker/rabbitmq/publisher';
 import { RabbitMQConnection } from '@/common/message-broker/rabbitmq/connection';
-import toResponse from '@/common/helpers/toResponse';
+import { toSuccessResponse, toBadRequestResponse } from '@/common/helpers/toResponse';
+import { isEmpty } from 'lodash';
 type Data = {
   message: string
 }
@@ -14,6 +15,9 @@ export default async function handler(
 ) {
   try {
     const { parentPageId, prefix } = req.body;
+    if (isEmpty(parentPageId)) {
+      res.status(400).json(toBadRequestResponse('parentPageId CANNOT be empty!'));
+    }
     const mqConnection = RabbitMQConnection.getConnection();
 
     const service = new DailyPageService(
@@ -21,7 +25,7 @@ export default async function handler(
       new MessagePublisher(mqConnection),
     );
     const result = await service.duplicatePage(parentPageId, prefix);
-    res.status(200).json(toResponse(result));
+    res.status(200).json(toSuccessResponse(result));
   } catch (error) {
     res.status(500).json({ message: (error as any).message || 'Internal server error' });
   }
