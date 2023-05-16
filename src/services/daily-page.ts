@@ -22,16 +22,17 @@ class DailyPageService {
     return now.format('D MMM');
   }
 
-  async duplicatePage(parentPageId: string, prefix?: string) {
+  async duplicatePage(productPageId: string, prefix?: string) {
     try {
       const title = this.getCurrentTitle();
-      const latestPage = await this.getLatestPage(parentPageId);
+      const dailyStandupPage = await this.confluence.getLastestDailyStandupPage(productPageId);
+      const latestPage = await this.getLatestPage(dailyStandupPage.id);
       if (!latestPage) {
         return;
       }
 
       const task = await this.confluence.duplicatePage({
-        parentPageId, fromPageId: latestPage?.id, title, search: latestPage?.title, prefix
+        parentPageId: dailyStandupPage.id, fromPageId: latestPage?.id, title, search: latestPage?.title, prefix
       });
       if (!task) {
         return;

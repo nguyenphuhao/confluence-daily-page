@@ -77,12 +77,25 @@ export class ConfluenceAPI {
       const pages = data.map((p: any) => {
         return {
           id: p.id,
-          title: p.title,
-          createdDate: moment(p.title, 'D MMM').format('YYYY/MM/DD')
+          title: p.title
         }
       });
-      const sortedPages = sortBy(pages, (p) => p.createdDate).reverse();
+      const sortedPages = sortBy(pages, (p) => p.id).reverse();
       return sortedPages;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getLastestDailyStandupPage(rootPageId: string): Promise<{
+    id: string;
+    title: string;
+    createdDate: string;
+  }> {
+    try {
+      const sprintPages = await this.getChildrenPages(rootPageId);
+      const dailyStandupPage = sprintPages.find((p) => p.title.includes(process.env.CONFLUENCE_DAILY_STANDUP_PAGE_NAME!))
+      return dailyStandupPage!;
     } catch (error) {
       throw error;
     }

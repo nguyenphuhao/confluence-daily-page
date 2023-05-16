@@ -14,17 +14,15 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   try {
-    const { parentPageId, prefix } = req.body;
-    if (isEmpty(parentPageId)) {
-      res.status(400).json(toBadRequestResponse('parentPageId CANNOT be empty!'));
-    }
+    const { prefix } = req.body;
+
     const mqConnection = RabbitMQConnection.getConnection();
 
     const service = new DailyPageService(
       new ConfluenceAPI(),
       new MessagePublisher(mqConnection),
     );
-    const result = await service.duplicatePage(parentPageId, prefix);
+    const result = await service.duplicatePage(process.env.CONFLUENCE_DAILY_PAGE_ROOT_ID!, prefix);
     res.status(200).json(toSuccessResponse(result));
   } catch (error) {
     res.status(500).json({ message: (error as any).message || 'Internal server error' });
