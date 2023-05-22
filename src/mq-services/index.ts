@@ -1,5 +1,5 @@
 import { MessageSubcriber } from "@/common/message-broker/rabbitmq/subcribers/interface";
-import { TrelloSyncSubcriber } from "./daily-page/trello-sync-subcriber";
+import { TrelloSyncSubcriber } from "./daily-page/sync-subcriber";
 
 class MessageQueueService {
   private subcribers: MessageSubcriber[] = [];

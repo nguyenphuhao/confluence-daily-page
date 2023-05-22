@@ -6,6 +6,7 @@ import { MessagePublisher } from '@/common/message-broker/rabbitmq/publisher';
 import { RabbitMQConnection } from '@/common/message-broker/rabbitmq/connection';
 import { toSuccessResponse, toBadRequestResponse } from '@/common/helpers/toResponse';
 import { isEmpty } from 'lodash';
+import { PinoLogger } from '@/common/logger/pino';
 type Data = {
   message: string
 }
@@ -21,6 +22,7 @@ export default async function handler(
     const service = new DailyPageService(
       new ConfluenceAPI(),
       new MessagePublisher(mqConnection),
+      new PinoLogger()
     );
     const result = await service.duplicatePage(process.env.CONFLUENCE_DAILY_PAGE_ROOT_ID!, prefix);
     res.status(200).json(toSuccessResponse(result));

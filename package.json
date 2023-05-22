@@ -24,11 +24,14 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "next": "13.3.4",
+    "pino": "^8.14.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.4"
   },
   "devDependencies": {
-    "@types/moment": "^2.13.0"
+    "@types/moment": "^2.13.0",
+    "@types/pino": "^7.0.5",
+    "pino-pretty": "^10.0.0"
   }
 }
