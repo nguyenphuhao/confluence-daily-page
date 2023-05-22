@@ -9,12 +9,7 @@ export class PinoLogger implements Logger {
   private publisher: IMessagePublisher
   constructor() {
     this.publisher = new MessagePublisher(RabbitMQConnection.getConnection());
-    const pinoOptions: LoggerOptions = {
-      transport: {
-        target: 'pino-pretty',
-      }
-    };
-    this.instance = pino(pinoOptions);
+    this.instance = pino();
   }
   fatal(obj: any, msg?: string, ...args: any[]) {
     this.instance.fatal(obj, msg, ...args);
