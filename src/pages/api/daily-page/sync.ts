@@ -1,10 +1,7 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import DailyPageService from '../../../services/daily-page';
 import { ConfluenceAPI } from '@/common/confluence-api';
-import { MessagePublisher } from '@/common/message-broker/rabbitmq/publisher';
 import { RabbitMQConnection } from '@/common/message-broker/rabbitmq/connection';
-import { TrelloSyncSubcriber } from '@/mq-services/daily-page/sync-subcriber';
+import { SyncSubcriber } from '@/mq-services/daily-page/sync-subcriber';
 import { DirectSubcriber } from '@/common/message-broker/rabbitmq/subcribers/direct';
 import { toSuccessResponse } from '@/common/helpers/toResponse';
 import { DailyPageAPI } from '@/common/power-automate-api/daily-page-api';
@@ -20,7 +17,7 @@ export default async function handler(
     const mqConnection = RabbitMQConnection.getConnection();
     const logger = new PinoLogger();
     logger.info('sync calling...')
-    new TrelloSyncSubcriber(
+    new SyncSubcriber(
       new DirectSubcriber(mqConnection),
       new ConfluenceAPI(),
       new DailyPageAPI(),

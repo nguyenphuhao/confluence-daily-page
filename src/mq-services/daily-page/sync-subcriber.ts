@@ -8,8 +8,9 @@ import { Logger } from "@/common/logger/interface";
 type TaskId = {
   taskId: string
 }
-export class TrelloSyncSubcriber implements Subcriber {
+export class SyncSubcriber implements Subcriber {
   constructor(private messageBroker: DirectSubcriber, private confluence: ConfluenceAPI, private dailyPageAPI: DailyPageAPI, private logger: Logger) {
+    this.logger.info('Init SyncSubcriber...')
   }
   subcribe() {
     this.messageBroker.subcribe<Partial<TaskId>>({
