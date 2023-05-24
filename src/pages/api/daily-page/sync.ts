@@ -24,7 +24,7 @@ export default async function handler(
       logger
     ).subcribe();
     logger.info('subcribed sync...')
-    res.status(200).json(toSuccessResponse(true));
+    res.status(200).json(toSuccessResponse({ test: true }));
   } catch (error) {
     res.status(500).json({ message: (error as any).message || 'Internal server error' });
   }
