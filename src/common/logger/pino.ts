@@ -23,6 +23,10 @@ export class PinoLogger implements Logger {
   }
   info(obj: any, msg?: string, ...args: any[]) {
     this.instance.info(obj, msg, ...args);
+    this.publisher.publish('exchange.log.info', 'route.log.info', {
+      message: msg,
+      data: obj.message
+    });
   }
   debug(obj: any, msg?: string, ...args: any[]) {
     this.instance.debug(obj, msg, ...args);

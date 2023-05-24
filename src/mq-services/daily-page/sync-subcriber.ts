@@ -18,6 +18,7 @@ export class TrelloSyncSubcriber implements Subcriber {
       routingKey: TRELLO_SYNC_ROUTE
     }, async (params) => {
       try {
+        this.logger.info(params, 'Start processing SYNCING...')
         if (params.taskId) {
           await this.sync(params.taskId);
         }
