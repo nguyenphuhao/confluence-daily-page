@@ -18,12 +18,15 @@ export default async function handler(
 ) {
   try {
     const mqConnection = RabbitMQConnection.getConnection();
+    const logger = new PinoLogger();
+    logger.info('sync calling...')
     new TrelloSyncSubcriber(
       new DirectSubcriber(mqConnection),
       new ConfluenceAPI(),
       new DailyPageAPI(),
-      new PinoLogger()
+      logger
     ).subcribe();
+    logger.info('subcribed sync...')
     res.status(200).json(toSuccessResponse(true));
   } catch (error) {
     res.status(500).json({ message: (error as any).message || 'Internal server error' });
