@@ -3,9 +3,11 @@ import moment from '@/common/moment';
 import { IMessagePublisher } from '@/common/message-broker/rabbitmq/publisher/interface';
 import { DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE } from '@/mq-services/daily-page/config';
 import { Logger } from '@/common/logger/interface';
+import { TrelloAPI } from '@/common/trello-api';
+import { DailyPageAPI } from '@/common/power-automate-api/daily-page-api';
 
 class DailyPageService {
-  constructor(private confluence: ConfluenceAPI, private messageBroker: IMessagePublisher, private logger: Logger) {
+  constructor(private confluence: ConfluenceAPI, private messageBroker: IMessagePublisher, private trello: TrelloAPI, private dailyPage: DailyPageAPI, private logger: Logger) {
   }
   private async getLatestPage(parentPageId: string) {
     try {
@@ -29,7 +31,7 @@ class DailyPageService {
       const dailyStandupPage = await this.confluence.getLastestDailyStandupPage(productPageId);
       const latestPage = await this.getLatestPage(dailyStandupPage.id);
       if (!latestPage) {
-        this.logger.warn('latestPage not found')
+        this.logger.warn('latestPage not found');
         return;
       }
 
@@ -40,6 +42,7 @@ class DailyPageService {
         this.logger.warn('task not found');
         return;
       }
+      this.trello.updateList(task.id);
       this.messageBroker.publish(DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE, {
         taskId: task.id
       });
@@ -50,5 +53,25 @@ class DailyPageService {
       throw error;
     }
   }
+
+  async sync() {
+    try {
+      const res = await this.trello.getList();
+      const task = await this.confluence.getLongTask(res.data.name);
+      if (!task?.successful) {
+        this.logger.info('sync', 'in progress');
+        throw new Error('in progress');
+      }
+      this.logger.info(task, 'Task syncing...');
+      const detail = task?.additionalDetails;
+      await this.dailyPage.createDailyPageRecord(`${process.env.CONFLUENCE_HOST}/wiki${detail.destinationUrl}`);
+      this.logger.info(detail.destinationUrl, 'Create url successfully');
+      return detail;
+    } catch (error) {
+      this.logger.error(error, 'Sync error');
+      throw error;
+    }
+  }
+
 }
 export default DailyPageService;

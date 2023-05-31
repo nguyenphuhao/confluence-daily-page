@@ -7,6 +7,8 @@ import { RabbitMQConnection } from '@/common/message-broker/rabbitmq/connection'
 import { toSuccessResponse, toBadRequestResponse } from '@/common/helpers/toResponse';
 import { isEmpty } from 'lodash';
 import { PinoLogger } from '@/common/logger/pino';
+import { TrelloAPI } from '@/common/trello-api';
+import { DailyPageAPI } from '@/common/power-automate-api/daily-page-api';
 type Data = {
   message: string
 }
@@ -20,9 +22,7 @@ export default async function handler(
     const mqConnection = RabbitMQConnection.getConnection();
 
     const service = new DailyPageService(
-      new ConfluenceAPI(),
-      new MessagePublisher(mqConnection),
-      new PinoLogger()
+      new ConfluenceAPI(), new MessagePublisher(mqConnection), new TrelloAPI(), new DailyPageAPI(), new PinoLogger()
     );
     const result = await service.duplicatePage(process.env.CONFLUENCE_DAILY_PAGE_ROOT_ID!, prefix);
     res.status(200).json(toSuccessResponse(result));
