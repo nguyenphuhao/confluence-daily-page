@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { ConfluenceAPI } from '@/common/confluence-api';
 import { RabbitMQConnection } from '@/common/message-broker/rabbitmq/connection';
-import { SyncSubcriber } from '@/mq-services/daily-page/sync-subcriber';
-import { DirectSubcriber } from '@/common/message-broker/rabbitmq/subcribers/direct';
 import { toSuccessResponse } from '@/common/helpers/toResponse';
 import { DailyPageAPI } from '@/common/power-automate-api/daily-page-api';
 import { PinoLogger } from '@/common/logger/pino';
@@ -21,7 +19,7 @@ export default async function handler(
     const logger = new PinoLogger();
     logger.info('sync calling...')
     const service = new DailyPageService(new ConfluenceAPI(), new MessagePublisher(mqConnection), new TrelloAPI(), new DailyPageAPI(), logger)
-    // service.sync();
+    service.sync(process.env.CONFLUENCE_DAILY_PAGE_ROOT_ID!);
     logger.info('subcribed sync...')
     res.status(200).json(toSuccessResponse({}));
   } catch (error) {
