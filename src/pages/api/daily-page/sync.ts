@@ -21,7 +21,7 @@ export default async function handler(
     const logger = new PinoLogger();
     logger.info('sync calling...')
     const service = new DailyPageService(new ConfluenceAPI(), new MessagePublisher(mqConnection), new TrelloAPI(), new DailyPageAPI(), logger)
-    service.sync();
+    // service.sync();
     logger.info('subcribed sync...')
     res.status(200).json(toSuccessResponse({}));
   } catch (error) {

@@ -42,10 +42,11 @@ class DailyPageService {
         this.logger.warn('task not found');
         return;
       }
-      this.trello.updateList(task.id);
-      this.messageBroker.publish(DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE, {
-        taskId: task.id
-      });
+      // this.trello.updateList(task.id);
+      // this.messageBroker.publish(DAILY_PAGE_EXCHANGE, TRELLO_SYNC_ROUTE, {
+      //   taskId: task.id
+      // });
+      this.sync(task.id);
       this.logger.info(task, 'Task found');
       return task;
     } catch (error) {
@@ -54,13 +55,12 @@ class DailyPageService {
     }
   }
 
-  async sync() {
+  async sync(taskId: string) {
     try {
-      const res = await this.trello.getList();
-      const task = await this.confluence.getLongTask(res.data.name);
+      const task = await this.confluence.getLongTask(taskId);
       if (!task?.successful) {
         this.logger.info('sync', 'in progress');
-        throw new Error('in progress');
+        await this.sync(taskId);
       }
       this.logger.info(task, 'Task syncing...');
       const detail = task?.additionalDetails;
